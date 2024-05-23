@@ -19,63 +19,72 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.generation.blogpessoal.model.Postagem;
 import com.generation.blogpessoal.repository.PostagemRepository;
+import com.generation.blogpessoal.repository.TemaRepository;
 
 import jakarta.validation.Valid;
 
-@RestController // anotações que diz para spring que essa é uma controladora de rotas e acesso aos metodos
-@RequestMapping("/postagens") // rota para chegar nessa classe "insomnia"
-@CrossOrigin(origins = "*", allowedHeaders = "*") // liberar o aceeso a outras maquinas / allowedHaeders = liberar passagem
+@RestController 
+@RequestMapping("/postagens") 
+@CrossOrigin(origins = "*", allowedHeaders = "*") 
 public class PostagemController {
 
-	@Autowired //injeção de dependecias - instaciar a classe postagemRepository
-	private PostagemRepository postagemRepository;
-	
-	@GetMapping //defini o verbo HTTP que atende esse metodo
-		public ResponseEntity<List<Postagem>> getAll(){
-		
-			//RepositoryEntity - Classe
-			return ResponseEntity.ok(postagemRepository.findAll());
-			// SELEC * FROM tb_postagens
-		}
+    @Autowired 
+    private PostagemRepository postagemRepository;
 
-	@GetMapping("/{id}")
-	public ResponseEntity<Postagem> getById(@PathVariable Long id) {
-		
-		return postagemRepository.findById(id)
-				.map(resposta -> ResponseEntity.ok(resposta))
-				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-	}
-	
-	@GetMapping("/titulo/{titulo}")
-	public ResponseEntity<List<Postagem>> getByTitulo(@PathVariable String titulo){
-			return ResponseEntity.ok(postagemRepository.findAllByTituloContainingIgnoreCase(titulo));
-		}
-	
-	@PostMapping
-	public ResponseEntity<Postagem> post(@Valid @RequestBody Postagem postagem) {
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(postagemRepository.save(postagem));
-		
-	}
-	
-	@PutMapping
-	public ResponseEntity<Postagem> put(@Valid @RequestBody Postagem postagem){
-		return postagemRepository.findById(postagem.getId())
-				.map(resposta-> ResponseEntity.status(HttpStatus.OK)
-				.body(postagemRepository.save(postagem)))
-				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    @Autowired
+    private TemaRepository temaRepository;
+
+    @GetMapping 
+    public ResponseEntity<List<Postagem>> getAll() {
+        return ResponseEntity.ok(postagemRepository.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Postagem> getById(@PathVariable Long id) {
+        return postagemRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    @GetMapping("/titulo/{titulo}")
+    public ResponseEntity<List<Postagem>> getByTitulo(@PathVariable String titulo) {
+        return ResponseEntity.ok(postagemRepository.findAllByTituloContainingIgnoreCase(titulo));
+    }
+
+    @PostMapping
+    public ResponseEntity<Postagem> post(@Valid @RequestBody Postagem postagem) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(postagemRepository.save(postagem));
+    }
+
+    @PutMapping
+    public ResponseEntity<Postagem> put(@Valid @RequestBody Postagem postagem) {
+        return postagemRepository.findById(postagem.getId())
+                .map(resposta -> ResponseEntity.status(HttpStatus.OK)
+                        .body(postagemRepository.save(postagem)))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        Optional<Postagem> postagem = postagemRepository.findById(id);
+        
+        if (postagem.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        
+        postagemRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+	public TemaRepository getTemaRepository() {
+		return temaRepository;
 	}
 
-		@DeleteMapping("/{id}")
-		public void delete(@PathVariable Long id) {
-			Optional<Postagem> postagem = postagemRepository.findById(id);
-			
-			if(postagem.isEmpty())
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-			
-			postagemRepository.deleteById(id);
+	public void setTemaRepository(TemaRepository temaRepository) {
+		this.temaRepository = temaRepository;
 	}
-	
 }
+
 	
 

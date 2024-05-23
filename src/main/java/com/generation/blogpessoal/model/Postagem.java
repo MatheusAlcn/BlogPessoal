@@ -4,23 +4,26 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-@Entity // Essa classe vai se tornar uma entidade do banco de dados
-@Table(name = "tb_postagens") //nomeando a tabela no banco de dados de tb_postagens
+@Entity 
+@Table(name = "tb_postagens") 
 public class Postagem {
 
-	@Id // torna o campo uma chave orimaria no banco de dados 
-	@GeneratedValue(strategy=GenerationType.IDENTITY) // tornando a chave primaria auto increment
+	@Id 
+	@GeneratedValue(strategy=GenerationType.IDENTITY) 
 	private Long id;
 	
-	@NotBlank(message = "O atributo TITULO é obrigatório!")// validation - validade nosso atrivuto NN e também não vazio 
+	@NotBlank(message = "O atributo TITULO é obrigatório!")
 	@Size(min = 5, max = 100, message = "O atributo TITULO deve ter no mínimo 5 caracteres e no máximo 100 caracteres.")
 	private String titulo;
 	
@@ -28,9 +31,13 @@ public class Postagem {
 	@Size(min = 10, max = 1000,  message = "O atributo TEXTO deve ter no mínimo 10 caracteres e no máximo 1000 caracteres")
 	private String texto;
 	
-	@UpdateTimestamp // pega a data e hora do sistema 
+	@UpdateTimestamp 
 	private LocalDateTime data;
-
+	
+	@ManyToOne 
+	@JsonIgnoreProperties("postagem") 
+	private Tema tema;
+	
 	public Long getId() {
 		return id;
 	}
@@ -61,6 +68,14 @@ public class Postagem {
 
 	public void setData(LocalDateTime data) {
 		this.data = data;
+	}
+
+	public Tema getTema() {
+		return tema;
+	}
+
+	public void setTema(Tema tema) {
+		this.tema = tema;
 	}
 	
 	
