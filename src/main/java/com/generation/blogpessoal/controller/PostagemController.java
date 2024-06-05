@@ -70,7 +70,7 @@ public class PostagemController {
         Optional<Postagem> postagem = postagemRepository.findById(id);
         
         if (postagem.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "O tema não existe!", null);
         }
         
         postagemRepository.deleteById(id);
