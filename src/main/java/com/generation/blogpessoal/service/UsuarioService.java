@@ -27,40 +27,26 @@ public class UsuarioService {
 	
 	@Autowired
 	private AuthenticationManager authenticationManager;
-	/*
-	 * classe do security que tem gestão de autenticação 
-	 * permite acessar metodos que podem entregar ao objeto as suas autoridades cancedidas  
-	 */
-	
-	//primeira regra de negocio | vamos definir as regras para permitor p cadastro do usuario 
-	public Optional<Usuario> cadastarUsuario(Usuario usuario) {
-		// nome | usuario(email) | senha | foto 
+
+	public Optional<Usuario> cadastrarUsuario(Usuario usuario) {
 		if(usuarioRepository.findByUsuario(usuario.getUsuario()).isPresent())
-			return Optional.empty(); //meu objeto esta vazio
+			return Optional.empty(); 
 			
 			usuario.setSenha(criptografarSenha(usuario.getSenha()));
 			
 			return Optional.of(usuarioRepository.save(usuario));
 	}
-	/*
-	 * método que vai tratar para a senha ser criptografada antes de ser persistida no banco
-	 */
+
 	private String criptografarSenha(String senha) {
-		//Classe que trata a criptografia
+
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		return encoder.encode(senha);//método encoder sendo aplicado na senha
+		return encoder.encode(senha);
 	}
 	
-	/*
-	 * segundo problema
-	 * objetivo evitar dois usuários com o mesmo email na hora do update 
-	 */
 	
 	public Optional<Usuario> atualizarUsuario(Usuario usuario) {
-		//validadando se o id passado existe ni banco de dados
 		if(usuarioRepository.findById(usuario.getId()).isPresent()){
-			
-			//objeto optional pq pode existir ou não
+
 			Optional<Usuario> buscarUsuario = usuarioRepository.findByUsuario(usuario.getUsuario());
 			
 			if(buscarUsuario.isPresent() && (buscarUsuario.get().getId() ) != usuario.getId())
@@ -72,16 +58,12 @@ public class UsuarioService {
 		}
 		return Optional.empty();
 	}
-	/*
-	 * garantir as regras de negocio ára o login
-	 */
+
 	public Optional<UsuarioLogin> autenticarUsuario(Optional<UsuarioLogin> usuarioLogin) {
         
-		// objeto com is dados do usuário que tenta logar 
 		var credenciais = new UsernamePasswordAuthenticationToken(usuarioLogin.get().getUsuario(),
 				usuarioLogin.get().getSenha());
 		
-		//tiver esse usuario e senha
 		Authentication authentication = authenticationManager.authenticate(credenciais);
         
 		if (authentication.isAuthenticated()) {
@@ -103,9 +85,7 @@ public class UsuarioService {
         }    
 		return Optional.empty();
     }
-	/*
-	 * métodp que vai la na jwtService
-	 */
+
 	private String gerarToken(String usuario) {
 		return "Bearer " + jwtService.generateToken(usuario);
 	}
