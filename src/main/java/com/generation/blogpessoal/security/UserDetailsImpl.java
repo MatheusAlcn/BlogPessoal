@@ -30,7 +30,7 @@ public class UserDetailsImpl implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		// autorizações de acesso do usuário
-		return null;
+		return authorities;
 	}
 
 	@Override
